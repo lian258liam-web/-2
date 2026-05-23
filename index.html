@@ -11,6 +11,16 @@
     <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <!-- إضافات PWA لتشغيل التطبيق على الأجهزة المحمولة -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="قلم">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3534/3534139.png">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -1619,6 +1629,39 @@
             saveCurrentContentImmediate();
         }
     });
+
+    // ==========================================
+    // تسجيل الـ Service Worker لتمكين العمل بدون إنترنت والتثبيت
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('✅ تم تسجيل Service Worker بنجاح:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('❌ فشل تسجيل Service Worker:', error);
+                });
+        });
+    }
+
+    // التعامل مع حدث تثبيت التطبيق على الشاشة الرئيسية
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // منع المتصفح من إظهار الشريط الافتراضي فوراً
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log('📱 التطبيق جاهز للتثبيت على الجوال');
+        
+        // اختياري: يمكنك إظهار رسالة للمستخدم تخبره بأن التطبيق جاهز للتثبيت
+        // showToast("التطبيق جاهز للتثبيت على شاشتك الرئيسية");
+    });
+
+    // التأكد من نجاح التثبيت
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('🎉 تم تثبيت تطبيق "قلم" بنجاح على الجهاز');
+        showToast("تم تثبيت التطبيق بنجاح!");
+    });
 </script>
 </body>
-</html>
+    </html>
